@@ -28,21 +28,21 @@ def send_message_with_retry(chat_session, user_message, max_retries=3):
     """
     Sends a message with automatic retries for 503 errors.
     """
-    for attempt in range(max_retries):
+    for attempt in range(max_retries):      #attempt to send msg to gemini
         try:
-            response = chat_session.send_message(user_message)
+            response = chat_session.send_message(user_message)      # actual API call
             return response.text
             
-        except Exception as e:
+        except Exception as e:      #handles errors(internet,server down)
             error_str = str(e)
             if "503" in error_str or "429" in error_str:
                 wait_time = 2 ** attempt
                 print(f"⚠️ Server busy (503/429). Retrying in {wait_time} seconds...")
                 time.sleep(wait_time)
             else:
-                return f"❌ An unrecoverable error occurred: {e}"
+                return f"❌ An unrecoverable error occurred: {e}"       #if the error is of a bad API
     
-    return "❌ Server is currently too busy. Please try again in a minute."
+    return "❌ Server is currently too busy. Please try again in a minute."     
 
 # --- Main Loop ---
 print(f"🤖 AI Chatbot (Connected and Ready)")
@@ -67,10 +67,11 @@ while True:
         
         # 2. Create a new, temporary prompt
         # This "wraps" the user's question with the real-time context
-        prompt_with_context = f"""
+        # Content ejection
+        prompt_with_context = f"""              
         A user is asking: "{user_input}"
         
-        For your reference, the current real-world time is: {current_time}.
+        For your reference, the current real-world time is: {current_time}.         
         
         Please answer the user's question using this exact time.
         """
